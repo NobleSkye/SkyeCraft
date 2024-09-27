@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go-version: ['1.23']
+        go-version: ['1.23.0']  # Updated to Go 1.23.0
 
     steps:
     - name: Checkout code
@@ -38,18 +38,39 @@ jobs:
     - name: Install dependencies
       run: go mod download
 
+    - name: Debug Go Environment
+      run: |
+        echo "Go Environment Information"
+        go env
+        echo "Go Version"
+        go version
+        echo "Current Directory"
+        pwd
+        echo "Listing Files"
+        ls -la
+        echo "Checking go.mod"
+        cat go.mod
+
     - name: Build for ${{ matrix.os }}
       run: |
+        echo "Starting build for $RUNNER_OS..."
         if [[ "$RUNNER_OS" == "Linux" ]]; then
           GOOS=linux GOARCH=amd64 go build -o builds/SkyeCraft-linux
         elif [[ "$RUNNER_OS" == "macOS" ]]; then
-          go build -o builds/SkyeCraft-macOS
+          GOOS=darwin GOARCH=amd64 go build -o builds/SkyeCraft-macOS
         elif [[ "$RUNNER_OS" == "Windows" ]]; then
           GOOS=windows GOARCH=amd64 go build -ldflags="-H windowsgui" -o builds/SkyeCraft.exe
         fi
+        echo "Build completed for $RUNNER_OS."
+      shell: bash
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: SkyeCraft
         path: builds/
+
+    - name: Print build folder contents
+      run: |
+        echo "Listing contents of builds/ folder"
+        ls -la builds/
