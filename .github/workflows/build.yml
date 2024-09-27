@@ -58,11 +58,6 @@ jobs:
         name: SkyeCraft
         path: builds/
 
-    - name: Print build folder contents
-      run: |
-        echo "Listing contents of builds/ folder"
-        ls -la builds/
-
   release:
     needs: build
     runs-on: ubuntu-latest
